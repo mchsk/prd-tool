@@ -7,6 +7,7 @@ use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DriveController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\PrdController;
+use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\RuleController;
 use App\Http\Controllers\ShareController;
 use App\Http\Controllers\TemplateController;
@@ -117,6 +118,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/prds/{prdId}/versions/{versionId}', [VersionController::class, 'show']);
     Route::post('/prds/{prdId}/versions/{versionId}/restore', [VersionController::class, 'restore']);
     Route::post('/prds/{prdId}/versions/compare', [VersionController::class, 'compare']);
+
+    // ----- Collaboration: Presence -----
+    Route::get('/prds/{prdId}/presence', [PresenceController::class, 'index']);
+    Route::post('/prds/{prdId}/presence', [PresenceController::class, 'update']);
+    Route::delete('/prds/{prdId}/presence', [PresenceController::class, 'leave']);
 });
 
 // ============================================
