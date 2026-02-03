@@ -9,6 +9,7 @@ use App\Http\Controllers\ExportController;
 use App\Http\Controllers\PrdController;
 use App\Http\Controllers\RuleController;
 use App\Http\Controllers\ShareController;
+use App\Http\Controllers\TemplateController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -99,6 +100,15 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/drive/picker-token', [DriveController::class, 'pickerToken']);
     Route::get('/drive/files', [DriveController::class, 'listFiles']);
     Route::post('/prds/{prdId}/drive/import', [DriveController::class, 'import']);
+
+    // ----- Templates -----
+    Route::get('/templates', [TemplateController::class, 'index']);
+    Route::get('/templates/categories', [TemplateController::class, 'categories']);
+    Route::post('/templates', [TemplateController::class, 'store']);
+    Route::get('/templates/{id}', [TemplateController::class, 'show']);
+    Route::put('/templates/{id}', [TemplateController::class, 'update']);
+    Route::delete('/templates/{id}', [TemplateController::class, 'destroy']);
+    Route::post('/templates/{id}/create-prd', [TemplateController::class, 'createPrd']);
 });
 
 // ============================================
