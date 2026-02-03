@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\PrdController;
@@ -47,4 +48,10 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/prds/{prdId}/messages', [ChatController::class, 'index']);
     Route::post('/prds/{prdId}/messages', [ChatController::class, 'store']);
     Route::post('/prds/{prdId}/messages/{messageId}/apply', [ChatController::class, 'applyUpdate']);
+
+    // ----- Attachments -----
+    Route::get('/prds/{prdId}/attachments', [AttachmentController::class, 'index']);
+    Route::post('/prds/{prdId}/attachments', [AttachmentController::class, 'store']);
+    Route::get('/prds/{prdId}/attachments/{attachmentId}', [AttachmentController::class, 'show']);
+    Route::delete('/prds/{prdId}/attachments/{attachmentId}', [AttachmentController::class, 'destroy']);
 });
