@@ -3,7 +3,6 @@
 namespace Database\Factories;
 
 use Illuminate\Database\Eloquent\Factories\Factory;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Support\Str;
 
 /**
@@ -12,11 +11,6 @@ use Illuminate\Support\Str;
 class UserFactory extends Factory
 {
     /**
-     * The current password being used by the factory.
-     */
-    protected static ?string $password;
-
-    /**
      * Define the model's default state.
      *
      * @return array<string, mixed>
@@ -24,21 +18,58 @@ class UserFactory extends Factory
     public function definition(): array
     {
         return [
+            'id' => Str::uuid(),
+            'google_id' => fake()->unique()->numerify('####################'),
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
-            'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
-            'remember_token' => Str::random(10),
+            'avatar_url' => fake()->imageUrl(100, 100, 'people'),
+            'google_access_token' => Str::random(100),
+            'google_refresh_token' => Str::random(100),
+            'google_token_expires_at' => now()->addHour(),
+            'preferred_language' => 'en',
+            'tier' => 'free',
+            'tier_expires_at' => null,
+            'stripe_customer_id' => null,
         ];
     }
 
     /**
-     * Indicate that the model's email address should be unverified.
+     * Indicate that the user is on the pro tier.
      */
-    public function unverified(): static
+    public function pro(): static
     {
         return $this->state(fn (array $attributes) => [
-            'email_verified_at' => null,
+            'tier' => 'pro',
+        ]);
+    }
+
+    /**
+     * Indicate that the user is on the team tier.
+     */
+    public function team(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'tier' => 'team',
+        ]);
+    }
+
+    /**
+     * Indicate that the user is on the enterprise tier.
+     */
+    public function enterprise(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'tier' => 'enterprise',
+        ]);
+    }
+
+    /**
+     * Indicate that the user has an expired Google token.
+     */
+    public function expiredToken(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'google_token_expires_at' => now()->subHour(),
         ]);
     }
 }

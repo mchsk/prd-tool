@@ -123,4 +123,32 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Application Version
+    |--------------------------------------------------------------------------
+    */
+
+    'version' => env('APP_VERSION', '1.0.0'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Token Encryption Key
+    |--------------------------------------------------------------------------
+    |
+    | This key is used to encrypt Google OAuth tokens at rest.
+    | Generate with: openssl rand -base64 32
+    |
+    */
+
+    'token_encryption_key' => env('TOKEN_ENCRYPTION_KEY'),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Frontend URL
+    |--------------------------------------------------------------------------
+    */
+
+    'frontend_url' => env('FRONTEND_URL', 'http://localhost:5173'),
+
 ];
