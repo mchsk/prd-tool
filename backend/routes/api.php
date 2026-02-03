@@ -4,6 +4,7 @@ use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\DriveController;
 use App\Http\Controllers\ExportController;
 use App\Http\Controllers\PrdController;
 use App\Http\Controllers\RuleController;
@@ -92,6 +93,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/prds/{prdId}/export/markdown', [ExportController::class, 'markdown']);
     Route::get('/prds/{prdId}/export/html', [ExportController::class, 'html']);
     Route::get('/prds/{prdId}/export/pdf', [ExportController::class, 'pdf']);
+
+    // ----- Google Drive -----
+    Route::get('/drive/status', [DriveController::class, 'status']);
+    Route::get('/drive/picker-token', [DriveController::class, 'pickerToken']);
+    Route::get('/drive/files', [DriveController::class, 'listFiles']);
+    Route::post('/prds/{prdId}/drive/import', [DriveController::class, 'import']);
 });
 
 // ============================================
