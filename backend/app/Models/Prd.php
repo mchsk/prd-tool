@@ -6,6 +6,7 @@ use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Prd extends Model
@@ -52,6 +53,16 @@ class Prd extends Model
     public function user(): BelongsTo
     {
         return $this->belongsTo(User::class);
+    }
+
+    /**
+     * Get the rules attached to this PRD.
+     */
+    public function rules(): BelongsToMany
+    {
+        return $this->belongsToMany(Rule::class, 'prd_rules')
+            ->withPivot('priority')
+            ->withTimestamps();
     }
 
     /**

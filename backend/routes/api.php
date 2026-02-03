@@ -5,6 +5,7 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PrdController;
+use App\Http\Controllers\RuleController;
 use App\Http\Controllers\ShareController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -73,6 +74,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/prds/{prdId}/comments', [CommentController::class, 'store']);
     Route::put('/prds/{prdId}/comments/{commentId}', [CommentController::class, 'update']);
     Route::delete('/prds/{prdId}/comments/{commentId}', [CommentController::class, 'destroy']);
+
+    // ----- Rules -----
+    Route::get('/rules', [RuleController::class, 'index']);
+    Route::post('/rules', [RuleController::class, 'store']);
+    Route::get('/rules/{id}', [RuleController::class, 'show']);
+    Route::put('/rules/{id}', [RuleController::class, 'update']);
+    Route::delete('/rules/{id}', [RuleController::class, 'destroy']);
+
+    // ----- PRD Rule Assignments -----
+    Route::get('/prds/{prdId}/rules', [RuleController::class, 'assigned']);
+    Route::post('/prds/{prdId}/rules', [RuleController::class, 'assign']);
 });
 
 // ============================================
