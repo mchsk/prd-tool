@@ -2,6 +2,7 @@
 
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\BillingController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
 use App\Http\Controllers\DriveController;
@@ -135,7 +136,18 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/teams/{id}/members', [TeamController::class, 'addMember']);
     Route::put('/teams/{id}/members/{memberId}', [TeamController::class, 'updateMember']);
     Route::delete('/teams/{id}/members/{memberId}', [TeamController::class, 'removeMember']);
+
+    // ----- Billing -----
+    Route::get('/billing/status', [BillingController::class, 'status']);
+    Route::get('/billing/plans', [BillingController::class, 'plans']);
+    Route::post('/billing/checkout', [BillingController::class, 'createCheckout']);
+    Route::post('/billing/portal', [BillingController::class, 'portal']);
 });
+
+// ============================================
+// WEBHOOKS (No Auth)
+// ============================================
+Route::post('/webhooks/stripe', [BillingController::class, 'webhook']);
 
 // ============================================
 // PUBLIC SHARE ACCESS (No Auth)
