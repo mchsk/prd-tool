@@ -10,6 +10,7 @@ use App\Http\Controllers\PrdController;
 use App\Http\Controllers\RuleController;
 use App\Http\Controllers\ShareController;
 use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\VersionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -109,6 +110,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::put('/templates/{id}', [TemplateController::class, 'update']);
     Route::delete('/templates/{id}', [TemplateController::class, 'destroy']);
     Route::post('/templates/{id}/create-prd', [TemplateController::class, 'createPrd']);
+
+    // ----- Version History -----
+    Route::get('/prds/{prdId}/versions', [VersionController::class, 'index']);
+    Route::post('/prds/{prdId}/versions', [VersionController::class, 'store']);
+    Route::get('/prds/{prdId}/versions/{versionId}', [VersionController::class, 'show']);
+    Route::post('/prds/{prdId}/versions/{versionId}/restore', [VersionController::class, 'restore']);
+    Route::post('/prds/{prdId}/versions/compare', [VersionController::class, 'compare']);
 });
 
 // ============================================
