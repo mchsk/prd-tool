@@ -10,6 +10,7 @@ use App\Http\Controllers\PrdController;
 use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\RuleController;
 use App\Http\Controllers\ShareController;
+use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\VersionController;
 use Illuminate\Http\Request;
@@ -123,6 +124,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/prds/{prdId}/presence', [PresenceController::class, 'index']);
     Route::post('/prds/{prdId}/presence', [PresenceController::class, 'update']);
     Route::delete('/prds/{prdId}/presence', [PresenceController::class, 'leave']);
+
+    // ----- Teams -----
+    Route::get('/teams', [TeamController::class, 'index']);
+    Route::post('/teams', [TeamController::class, 'store']);
+    Route::get('/teams/{id}', [TeamController::class, 'show']);
+    Route::put('/teams/{id}', [TeamController::class, 'update']);
+    Route::delete('/teams/{id}', [TeamController::class, 'destroy']);
+    Route::get('/teams/{id}/members', [TeamController::class, 'members']);
+    Route::post('/teams/{id}/members', [TeamController::class, 'addMember']);
+    Route::put('/teams/{id}/members/{memberId}', [TeamController::class, 'updateMember']);
+    Route::delete('/teams/{id}/members/{memberId}', [TeamController::class, 'removeMember']);
 });
 
 // ============================================
