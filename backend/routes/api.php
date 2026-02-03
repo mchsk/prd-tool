@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\ChatController;
 use App\Http\Controllers\PrdController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -41,4 +42,9 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::delete('/prds/{id}', [PrdController::class, 'destroy']);
     Route::get('/prds/{id}/content', [PrdController::class, 'getContent']);
     Route::put('/prds/{id}/content', [PrdController::class, 'updateContent']);
+
+    // ----- Chat -----
+    Route::get('/prds/{prdId}/messages', [ChatController::class, 'index']);
+    Route::post('/prds/{prdId}/messages', [ChatController::class, 'store']);
+    Route::post('/prds/{prdId}/messages/{messageId}/apply', [ChatController::class, 'applyUpdate']);
 });

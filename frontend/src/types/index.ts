@@ -22,6 +22,17 @@ export interface Prd {
   updated_at: string;
 }
 
+// Message types
+export interface Message {
+  id: string;
+  role: 'user' | 'assistant';
+  content: string;
+  prd_update_suggestion: string | null;
+  update_applied: boolean;
+  token_count: number;
+  created_at: string;
+}
+
 // API Error type
 export interface ApiError {
   message: string;
