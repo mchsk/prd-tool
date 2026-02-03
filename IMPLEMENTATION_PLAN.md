@@ -5707,6 +5707,2017 @@ protected function schedule(Schedule $schedule): void
 
 ---
 
+## UX System — Complete Design Specifications
+
+This section provides the complete UX implementation to ensure top-notch user experience across all features.
+
+### Design Tokens
+
+```typescript
+// src/lib/design-tokens.ts
+export const tokens = {
+  colors: {
+    // Primary (Blue)
+    primary: {
+      50: '#eff6ff',
+      100: '#dbeafe',
+      200: '#bfdbfe',
+      300: '#93c5fd',
+      400: '#60a5fa',
+      500: '#3b82f6',  // Main
+      600: '#2563eb',
+      700: '#1d4ed8',
+      800: '#1e40af',
+      900: '#1e3a8a',
+    },
+    // Slate (Neutral)
+    slate: {
+      50: '#f8fafc',
+      100: '#f1f5f9',
+      200: '#e2e8f0',
+      300: '#cbd5e1',
+      400: '#94a3b8',
+      500: '#64748b',
+      600: '#475569',
+      700: '#334155',
+      800: '#1e293b',
+      900: '#0f172a',
+    },
+    // Semantic
+    success: '#10b981',
+    warning: '#f59e0b',
+    error: '#ef4444',
+    info: '#3b82f6',
+  },
+  
+  spacing: {
+    xs: '0.25rem',   // 4px
+    sm: '0.5rem',    // 8px
+    md: '1rem',      // 16px
+    lg: '1.5rem',    // 24px
+    xl: '2rem',      // 32px
+    '2xl': '3rem',   // 48px
+    '3xl': '4rem',   // 64px
+  },
+  
+  typography: {
+    fontFamily: {
+      sans: 'Inter, system-ui, -apple-system, sans-serif',
+      mono: 'JetBrains Mono, Menlo, monospace',
+    },
+    fontSize: {
+      xs: ['0.75rem', { lineHeight: '1rem' }],
+      sm: ['0.875rem', { lineHeight: '1.25rem' }],
+      base: ['1rem', { lineHeight: '1.5rem' }],
+      lg: ['1.125rem', { lineHeight: '1.75rem' }],
+      xl: ['1.25rem', { lineHeight: '1.75rem' }],
+      '2xl': ['1.5rem', { lineHeight: '2rem' }],
+      '3xl': ['1.875rem', { lineHeight: '2.25rem' }],
+    },
+  },
+  
+  animation: {
+    duration: {
+      instant: '50ms',
+      fast: '150ms',
+      normal: '250ms',
+      slow: '400ms',
+    },
+    easing: {
+      default: 'cubic-bezier(0.4, 0, 0.2, 1)',
+      in: 'cubic-bezier(0.4, 0, 1, 1)',
+      out: 'cubic-bezier(0, 0, 0.2, 1)',
+      bounce: 'cubic-bezier(0.68, -0.55, 0.265, 1.55)',
+    },
+  },
+  
+  shadows: {
+    sm: '0 1px 2px 0 rgb(0 0 0 / 0.05)',
+    md: '0 4px 6px -1px rgb(0 0 0 / 0.1)',
+    lg: '0 10px 15px -3px rgb(0 0 0 / 0.1)',
+    xl: '0 20px 25px -5px rgb(0 0 0 / 0.1)',
+  },
+  
+  radius: {
+    sm: '0.25rem',
+    md: '0.375rem',
+    lg: '0.5rem',
+    xl: '0.75rem',
+    full: '9999px',
+  },
+} as const;
+```
+
+### Tailwind Configuration
+
+```javascript
+// tailwind.config.js
+module.exports = {
+  content: ['./src/**/*.{js,ts,jsx,tsx}'],
+  theme: {
+    extend: {
+      fontFamily: {
+        sans: ['Inter', 'system-ui', '-apple-system', 'sans-serif'],
+        mono: ['JetBrains Mono', 'Menlo', 'monospace'],
+      },
+      animation: {
+        'fade-in': 'fadeIn 150ms ease-out',
+        'fade-out': 'fadeOut 150ms ease-in',
+        'slide-up': 'slideUp 250ms ease-out',
+        'slide-down': 'slideDown 250ms ease-out',
+        'scale-in': 'scaleIn 150ms ease-out',
+        'spin-slow': 'spin 1.5s linear infinite',
+        'pulse-subtle': 'pulseSubtle 2s ease-in-out infinite',
+        'shimmer': 'shimmer 2s ease-in-out infinite',
+      },
+      keyframes: {
+        fadeIn: {
+          '0%': { opacity: '0' },
+          '100%': { opacity: '1' },
+        },
+        fadeOut: {
+          '0%': { opacity: '1' },
+          '100%': { opacity: '0' },
+        },
+        slideUp: {
+          '0%': { opacity: '0', transform: 'translateY(10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        slideDown: {
+          '0%': { opacity: '0', transform: 'translateY(-10px)' },
+          '100%': { opacity: '1', transform: 'translateY(0)' },
+        },
+        scaleIn: {
+          '0%': { opacity: '0', transform: 'scale(0.95)' },
+          '100%': { opacity: '1', transform: 'scale(1)' },
+        },
+        pulseSubtle: {
+          '0%, 100%': { opacity: '1' },
+          '50%': { opacity: '0.7' },
+        },
+        shimmer: {
+          '0%': { backgroundPosition: '-200% 0' },
+          '100%': { backgroundPosition: '200% 0' },
+        },
+      },
+    },
+  },
+  plugins: [
+    require('@tailwindcss/typography'),
+    require('@tailwindcss/forms'),
+  ],
+};
+```
+
+### Component Library
+
+#### Button Component
+
+```typescript
+// src/components/ui/Button.tsx
+import { forwardRef } from 'react';
+import { clsx } from 'clsx';
+import { Spinner } from './Spinner';
+
+type ButtonVariant = 'primary' | 'secondary' | 'ghost' | 'danger';
+type ButtonSize = 'sm' | 'md' | 'lg';
+
+interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
+  variant?: ButtonVariant;
+  size?: ButtonSize;
+  isLoading?: boolean;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+  fullWidth?: boolean;
+}
+
+const variantStyles: Record<ButtonVariant, string> = {
+  primary: `
+    bg-primary-600 text-white 
+    hover:bg-primary-700 
+    focus:ring-primary-500
+    disabled:bg-primary-300
+  `,
+  secondary: `
+    bg-white text-slate-700 border border-slate-300
+    hover:bg-slate-50 
+    focus:ring-primary-500
+    disabled:bg-slate-100 disabled:text-slate-400
+  `,
+  ghost: `
+    bg-transparent text-slate-600
+    hover:bg-slate-100 hover:text-slate-900
+    focus:ring-slate-500
+    disabled:text-slate-300
+  `,
+  danger: `
+    bg-red-600 text-white
+    hover:bg-red-700
+    focus:ring-red-500
+    disabled:bg-red-300
+  `,
+};
+
+const sizeStyles: Record<ButtonSize, string> = {
+  sm: 'px-3 py-1.5 text-sm gap-1.5',
+  md: 'px-4 py-2 text-sm gap-2',
+  lg: 'px-6 py-3 text-base gap-2',
+};
+
+export const Button = forwardRef<HTMLButtonElement, ButtonProps>(
+  (
+    {
+      variant = 'primary',
+      size = 'md',
+      isLoading = false,
+      leftIcon,
+      rightIcon,
+      fullWidth = false,
+      disabled,
+      children,
+      className,
+      ...props
+    },
+    ref
+  ) => {
+    return (
+      <button
+        ref={ref}
+        disabled={disabled || isLoading}
+        className={clsx(
+          // Base styles
+          'inline-flex items-center justify-center font-medium rounded-lg',
+          'transition-all duration-150 ease-out',
+          'focus:outline-none focus:ring-2 focus:ring-offset-2',
+          'disabled:cursor-not-allowed',
+          // Variant
+          variantStyles[variant],
+          // Size
+          sizeStyles[size],
+          // Full width
+          fullWidth && 'w-full',
+          // Loading state opacity
+          isLoading && 'opacity-80',
+          className
+        )}
+        {...props}
+      >
+        {isLoading ? (
+          <Spinner size={size === 'lg' ? 'md' : 'sm'} />
+        ) : leftIcon ? (
+          <span className="shrink-0">{leftIcon}</span>
+        ) : null}
+        
+        <span className={isLoading ? 'opacity-0' : undefined}>{children}</span>
+        
+        {rightIcon && !isLoading && (
+          <span className="shrink-0">{rightIcon}</span>
+        )}
+      </button>
+    );
+  }
+);
+
+Button.displayName = 'Button';
+```
+
+#### Input Component
+
+```typescript
+// src/components/ui/Input.tsx
+import { forwardRef, useId } from 'react';
+import { clsx } from 'clsx';
+
+interface InputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  label?: string;
+  error?: string;
+  hint?: string;
+  leftIcon?: React.ReactNode;
+  rightIcon?: React.ReactNode;
+}
+
+export const Input = forwardRef<HTMLInputElement, InputProps>(
+  ({ label, error, hint, leftIcon, rightIcon, className, id, ...props }, ref) => {
+    const generatedId = useId();
+    const inputId = id || generatedId;
+    
+    return (
+      <div className="w-full">
+        {label && (
+          <label
+            htmlFor={inputId}
+            className="block text-sm font-medium text-slate-700 mb-1.5"
+          >
+            {label}
+            {props.required && <span className="text-red-500 ml-0.5">*</span>}
+          </label>
+        )}
+        
+        <div className="relative">
+          {leftIcon && (
+            <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
+              <span className="text-slate-400">{leftIcon}</span>
+            </div>
+          )}
+          
+          <input
+            ref={ref}
+            id={inputId}
+            aria-invalid={!!error}
+            aria-describedby={error ? `${inputId}-error` : hint ? `${inputId}-hint` : undefined}
+            className={clsx(
+              // Base
+              'block w-full rounded-lg border bg-white px-3 py-2',
+              'text-slate-900 placeholder:text-slate-400',
+              'transition-colors duration-150',
+              // Focus
+              'focus:outline-none focus:ring-2 focus:ring-offset-0',
+              // States
+              error
+                ? 'border-red-300 focus:border-red-500 focus:ring-red-500/20'
+                : 'border-slate-300 focus:border-primary-500 focus:ring-primary-500/20',
+              // Disabled
+              'disabled:bg-slate-50 disabled:text-slate-500 disabled:cursor-not-allowed',
+              // Icons
+              leftIcon && 'pl-10',
+              rightIcon && 'pr-10',
+              className
+            )}
+            {...props}
+          />
+          
+          {rightIcon && (
+            <div className="absolute inset-y-0 right-0 pr-3 flex items-center">
+              <span className="text-slate-400">{rightIcon}</span>
+            </div>
+          )}
+        </div>
+        
+        {error && (
+          <p id={`${inputId}-error`} className="mt-1.5 text-sm text-red-600" role="alert">
+            {error}
+          </p>
+        )}
+        
+        {hint && !error && (
+          <p id={`${inputId}-hint`} className="mt-1.5 text-sm text-slate-500">
+            {hint}
+          </p>
+        )}
+      </div>
+    );
+  }
+);
+
+Input.displayName = 'Input';
+```
+
+#### Skeleton Components
+
+```typescript
+// src/components/ui/Skeleton.tsx
+import { clsx } from 'clsx';
+
+interface SkeletonProps {
+  className?: string;
+  variant?: 'text' | 'circular' | 'rectangular';
+  width?: string | number;
+  height?: string | number;
+  lines?: number;
+}
+
+export const Skeleton: React.FC<SkeletonProps> = ({
+  className,
+  variant = 'text',
+  width,
+  height,
+  lines = 1,
+}) => {
+  const baseClasses = 'bg-slate-200 animate-shimmer bg-gradient-to-r from-slate-200 via-slate-100 to-slate-200 bg-[length:200%_100%]';
+  
+  if (variant === 'text' && lines > 1) {
+    return (
+      <div className="space-y-2">
+        {Array.from({ length: lines }).map((_, i) => (
+          <div
+            key={i}
+            className={clsx(
+              baseClasses,
+              'h-4 rounded',
+              i === lines - 1 && 'w-3/4', // Last line shorter
+              className
+            )}
+            style={{ width: i === lines - 1 ? '75%' : width }}
+          />
+        ))}
+      </div>
+    );
+  }
+  
+  return (
+    <div
+      className={clsx(
+        baseClasses,
+        variant === 'text' && 'h-4 rounded',
+        variant === 'circular' && 'rounded-full',
+        variant === 'rectangular' && 'rounded-lg',
+        className
+      )}
+      style={{ width, height }}
+    />
+  );
+};
+
+// Dashboard Skeleton
+export const DashboardSkeleton: React.FC = () => (
+  <div className="max-w-6xl mx-auto px-4 py-8 animate-fade-in">
+    {/* Header */}
+    <div className="flex items-center justify-between mb-8">
+      <Skeleton width={150} height={32} variant="rectangular" />
+      <Skeleton width={120} height={40} variant="rectangular" />
+    </div>
+    
+    {/* Filters */}
+    <div className="flex gap-4 mb-6">
+      <Skeleton width={256} height={40} variant="rectangular" />
+      <Skeleton width={150} height={40} variant="rectangular" />
+    </div>
+    
+    {/* Grid */}
+    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+      {Array.from({ length: 6 }).map((_, i) => (
+        <PrdCardSkeleton key={i} />
+      ))}
+    </div>
+  </div>
+);
+
+// PRD Card Skeleton
+export const PrdCardSkeleton: React.FC = () => (
+  <div className="bg-white rounded-xl border border-slate-200 p-4">
+    <div className="flex items-start justify-between mb-3">
+      <Skeleton width="70%" height={20} variant="text" />
+      <Skeleton width={24} height={24} variant="circular" />
+    </div>
+    <Skeleton lines={2} className="mb-4" />
+    <div className="flex items-center justify-between">
+      <Skeleton width={80} height={16} variant="text" />
+      <Skeleton width={60} height={24} variant="rectangular" />
+    </div>
+  </div>
+);
+
+// Editor Skeleton
+export const EditorSkeleton: React.FC = () => (
+  <div className="h-screen flex">
+    {/* Sidebar */}
+    <div className="w-80 border-r border-slate-200 p-4">
+      <Skeleton width="100%" height={40} variant="rectangular" className="mb-4" />
+      <div className="space-y-2">
+        {Array.from({ length: 8 }).map((_, i) => (
+          <Skeleton key={i} width="100%" height={32} variant="rectangular" />
+        ))}
+      </div>
+    </div>
+    
+    {/* Main content */}
+    <div className="flex-1 p-6">
+      <Skeleton width="50%" height={36} variant="text" className="mb-6" />
+      <Skeleton lines={20} />
+    </div>
+    
+    {/* Chat panel */}
+    <div className="w-96 border-l border-slate-200 p-4">
+      <div className="space-y-4">
+        {Array.from({ length: 4 }).map((_, i) => (
+          <div key={i} className={clsx(i % 2 === 0 ? 'ml-auto w-3/4' : 'mr-auto w-3/4')}>
+            <Skeleton height={60} variant="rectangular" />
+          </div>
+        ))}
+      </div>
+    </div>
+  </div>
+);
+
+// Message Skeleton (for loading more messages)
+export const MessageSkeleton: React.FC<{ isUser?: boolean }> = ({ isUser = false }) => (
+  <div className={clsx('flex', isUser ? 'justify-end' : 'justify-start')}>
+    <div className={clsx('max-w-[80%] rounded-2xl p-4', isUser ? 'bg-primary-100' : 'bg-slate-100')}>
+      <Skeleton lines={2} />
+    </div>
+  </div>
+);
+```
+
+#### Toast Notification System
+
+```typescript
+// src/components/ui/Toast.tsx
+import * as ToastPrimitive from '@radix-ui/react-toast';
+import { clsx } from 'clsx';
+import { CheckCircle, XCircle, AlertCircle, Info, X } from 'lucide-react';
+import { create } from 'zustand';
+
+type ToastType = 'success' | 'error' | 'warning' | 'info';
+
+interface Toast {
+  id: string;
+  type: ToastType;
+  title: string;
+  description?: string;
+  duration?: number;
+  action?: { label: string; onClick: () => void };
+}
+
+interface ToastStore {
+  toasts: Toast[];
+  addToast: (toast: Omit<Toast, 'id'>) => void;
+  removeToast: (id: string) => void;
+}
+
+export const useToastStore = create<ToastStore>((set) => ({
+  toasts: [],
+  addToast: (toast) => {
+    const id = Math.random().toString(36).slice(2);
+    set((state) => ({ toasts: [...state.toasts, { ...toast, id }] }));
+    
+    // Auto remove after duration
+    setTimeout(() => {
+      set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }));
+    }, toast.duration || 5000);
+  },
+  removeToast: (id) => {
+    set((state) => ({ toasts: state.toasts.filter((t) => t.id !== id) }));
+  },
+}));
+
+// Convenience functions
+export const toast = {
+  success: (title: string, description?: string) =>
+    useToastStore.getState().addToast({ type: 'success', title, description }),
+  error: (title: string, description?: string) =>
+    useToastStore.getState().addToast({ type: 'error', title, description, duration: 8000 }),
+  warning: (title: string, description?: string) =>
+    useToastStore.getState().addToast({ type: 'warning', title, description }),
+  info: (title: string, description?: string) =>
+    useToastStore.getState().addToast({ type: 'info', title, description }),
+};
+
+const icons: Record<ToastType, React.ReactNode> = {
+  success: <CheckCircle className="w-5 h-5 text-green-500" />,
+  error: <XCircle className="w-5 h-5 text-red-500" />,
+  warning: <AlertCircle className="w-5 h-5 text-amber-500" />,
+  info: <Info className="w-5 h-5 text-blue-500" />,
+};
+
+const styles: Record<ToastType, string> = {
+  success: 'border-green-200 bg-green-50',
+  error: 'border-red-200 bg-red-50',
+  warning: 'border-amber-200 bg-amber-50',
+  info: 'border-blue-200 bg-blue-50',
+};
+
+export const ToastProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { toasts, removeToast } = useToastStore();
+  
+  return (
+    <ToastPrimitive.Provider swipeDirection="right">
+      {children}
+      
+      {toasts.map((toast) => (
+        <ToastPrimitive.Root
+          key={toast.id}
+          className={clsx(
+            'fixed bottom-4 right-4 z-50',
+            'flex items-start gap-3 p-4 rounded-lg border shadow-lg',
+            'animate-slide-up',
+            'data-[state=closed]:animate-fade-out',
+            styles[toast.type]
+          )}
+          duration={toast.duration}
+        >
+          <div className="shrink-0 mt-0.5">{icons[toast.type]}</div>
+          
+          <div className="flex-1 min-w-0">
+            <ToastPrimitive.Title className="text-sm font-semibold text-slate-900">
+              {toast.title}
+            </ToastPrimitive.Title>
+            
+            {toast.description && (
+              <ToastPrimitive.Description className="mt-1 text-sm text-slate-600">
+                {toast.description}
+              </ToastPrimitive.Description>
+            )}
+            
+            {toast.action && (
+              <ToastPrimitive.Action
+                altText={toast.action.label}
+                onClick={toast.action.onClick}
+                className="mt-2 text-sm font-medium text-primary-600 hover:text-primary-700"
+              >
+                {toast.action.label}
+              </ToastPrimitive.Action>
+            )}
+          </div>
+          
+          <ToastPrimitive.Close
+            onClick={() => removeToast(toast.id)}
+            className="shrink-0 p-1 rounded hover:bg-slate-200/50 transition-colors"
+            aria-label="Dismiss"
+          >
+            <X className="w-4 h-4 text-slate-500" />
+          </ToastPrimitive.Close>
+        </ToastPrimitive.Root>
+      ))}
+      
+      <ToastPrimitive.Viewport />
+    </ToastPrimitive.Provider>
+  );
+};
+```
+
+#### Empty State Component
+
+```typescript
+// src/components/ui/EmptyState.tsx
+import { clsx } from 'clsx';
+
+interface EmptyStateProps {
+  icon: React.ReactNode;
+  title: string;
+  description: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+  secondaryAction?: {
+    label: string;
+    onClick: () => void;
+  };
+  className?: string;
+}
+
+export const EmptyState: React.FC<EmptyStateProps> = ({
+  icon,
+  title,
+  description,
+  action,
+  secondaryAction,
+  className,
+}) => (
+  <div
+    className={clsx(
+      'flex flex-col items-center justify-center py-16 px-4',
+      'text-center animate-fade-in',
+      className
+    )}
+  >
+    <div className="w-16 h-16 rounded-full bg-slate-100 flex items-center justify-center mb-4">
+      <span className="text-slate-400">{icon}</span>
+    </div>
+    
+    <h3 className="text-lg font-semibold text-slate-900 mb-2">{title}</h3>
+    
+    <p className="text-slate-500 max-w-sm mb-6">{description}</p>
+    
+    <div className="flex items-center gap-3">
+      {action && (
+        <Button onClick={action.onClick}>
+          {action.label}
+        </Button>
+      )}
+      
+      {secondaryAction && (
+        <Button variant="ghost" onClick={secondaryAction.onClick}>
+          {secondaryAction.label}
+        </Button>
+      )}
+    </div>
+  </div>
+);
+
+// Specific empty states
+export const NoPrdsEmptyState: React.FC<{ onCreateClick: () => void }> = ({ onCreateClick }) => (
+  <EmptyState
+    icon={<DocumentIcon className="w-8 h-8" />}
+    title="No PRDs yet"
+    description="Create your first PRD to get started with AI-powered product requirements documentation."
+    action={{ label: 'Create your first PRD', onClick: onCreateClick }}
+  />
+);
+
+export const NoSearchResultsEmptyState: React.FC<{ onClearClick: () => void }> = ({ onClearClick }) => (
+  <EmptyState
+    icon={<SearchIcon className="w-8 h-8" />}
+    title="No results found"
+    description="We couldn't find any PRDs matching your search. Try adjusting your filters."
+    action={{ label: 'Clear filters', onClick: onClearClick }}
+  />
+);
+
+export const NoMessagesEmptyState: React.FC = () => (
+  <EmptyState
+    icon={<ChatIcon className="w-8 h-8" />}
+    title="Start a conversation"
+    description="Ask Claude to help you build your PRD. Try asking about features, user stories, or technical requirements."
+  />
+);
+
+export const NoCollaboratorsEmptyState: React.FC<{ onInviteClick: () => void }> = ({ onInviteClick }) => (
+  <EmptyState
+    icon={<UsersIcon className="w-8 h-8" />}
+    title="No collaborators"
+    description="Invite team members to collaborate on this PRD in real-time."
+    action={{ label: 'Invite collaborators', onClick: onInviteClick }}
+  />
+);
+```
+
+#### Error State Component
+
+```typescript
+// src/components/ui/ErrorState.tsx
+import { AlertTriangle, RefreshCw, Home } from 'lucide-react';
+import { Button } from './Button';
+
+interface ErrorStateProps {
+  title?: string;
+  message: string;
+  action?: {
+    label: string;
+    onClick: () => void;
+  };
+  showHomeLink?: boolean;
+}
+
+export const ErrorState: React.FC<ErrorStateProps> = ({
+  title = 'Something went wrong',
+  message,
+  action,
+  showHomeLink = false,
+}) => (
+  <div className="flex flex-col items-center justify-center py-16 px-4 text-center animate-fade-in">
+    <div className="w-16 h-16 rounded-full bg-red-100 flex items-center justify-center mb-4">
+      <AlertTriangle className="w-8 h-8 text-red-500" />
+    </div>
+    
+    <h3 className="text-lg font-semibold text-slate-900 mb-2">{title}</h3>
+    
+    <p className="text-slate-500 max-w-sm mb-6">{message}</p>
+    
+    <div className="flex items-center gap-3">
+      {action && (
+        <Button onClick={action.onClick} leftIcon={<RefreshCw className="w-4 h-4" />}>
+          {action.label}
+        </Button>
+      )}
+      
+      {showHomeLink && (
+        <Button variant="ghost" onClick={() => window.location.href = '/'}>
+          <Home className="w-4 h-4 mr-2" />
+          Go home
+        </Button>
+      )}
+    </div>
+  </div>
+);
+
+// API Error Display
+export const ApiErrorDisplay: React.FC<{ error: ApiError; onRetry?: () => void }> = ({ error, onRetry }) => {
+  const getErrorMessage = () => {
+    switch (error.code) {
+      case 'RATE_LIMITED':
+        return `Too many requests. Please try again in ${error.retry_after} seconds.`;
+      case 'CONTEXT_LIMIT_REACHED':
+        return 'Context limit reached. Please summarize your conversation to continue.';
+      case 'TIER_REQUIRED':
+        return 'This feature requires a higher plan. Upgrade to continue.';
+      case 'STORAGE_ERROR':
+        return 'Unable to save your changes. Please try again.';
+      default:
+        return error.message;
+    }
+  };
+  
+  return (
+    <div className="bg-red-50 border border-red-200 rounded-lg p-4" role="alert">
+      <div className="flex items-start gap-3">
+        <AlertTriangle className="w-5 h-5 text-red-500 shrink-0 mt-0.5" />
+        <div className="flex-1">
+          <p className="text-sm font-medium text-red-800">{getErrorMessage()}</p>
+          
+          {error.code === 'TIER_REQUIRED' && (
+            <a
+              href="/billing"
+              className="inline-block mt-2 text-sm font-medium text-red-600 hover:text-red-700"
+            >
+              View plans →
+            </a>
+          )}
+          
+          {onRetry && error.code !== 'TIER_REQUIRED' && (
+            <button
+              onClick={onRetry}
+              className="mt-2 text-sm font-medium text-red-600 hover:text-red-700"
+            >
+              Try again
+            </button>
+          )}
+        </div>
+      </div>
+    </div>
+  );
+};
+```
+
+#### Save Status Indicator
+
+```typescript
+// src/components/ui/SaveStatus.tsx
+import { clsx } from 'clsx';
+import { Check, Cloud, AlertCircle, Loader2 } from 'lucide-react';
+
+type SaveState = 'idle' | 'saving' | 'saved' | 'error';
+
+interface SaveStatusProps {
+  state: SaveState;
+  lastSaved?: Date;
+  error?: string;
+  onRetry?: () => void;
+}
+
+export const SaveStatus: React.FC<SaveStatusProps> = ({
+  state,
+  lastSaved,
+  error,
+  onRetry,
+}) => {
+  const formatLastSaved = (date: Date) => {
+    const now = new Date();
+    const diffMs = now.getTime() - date.getTime();
+    const diffMins = Math.floor(diffMs / 60000);
+    
+    if (diffMins < 1) return 'Just now';
+    if (diffMins === 1) return '1 min ago';
+    if (diffMins < 60) return `${diffMins} mins ago`;
+    
+    return date.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+  };
+  
+  return (
+    <div
+      className={clsx(
+        'flex items-center gap-2 px-3 py-1.5 rounded-full text-sm',
+        'transition-all duration-300',
+        state === 'idle' && 'bg-slate-100 text-slate-600',
+        state === 'saving' && 'bg-blue-100 text-blue-700',
+        state === 'saved' && 'bg-green-100 text-green-700',
+        state === 'error' && 'bg-red-100 text-red-700'
+      )}
+      role="status"
+      aria-live="polite"
+    >
+      {state === 'idle' && (
+        <>
+          <Cloud className="w-4 h-4" />
+          <span>All changes saved</span>
+          {lastSaved && (
+            <span className="text-slate-500">• {formatLastSaved(lastSaved)}</span>
+          )}
+        </>
+      )}
+      
+      {state === 'saving' && (
+        <>
+          <Loader2 className="w-4 h-4 animate-spin" />
+          <span>Saving...</span>
+        </>
+      )}
+      
+      {state === 'saved' && (
+        <>
+          <Check className="w-4 h-4" />
+          <span>Saved</span>
+        </>
+      )}
+      
+      {state === 'error' && (
+        <>
+          <AlertCircle className="w-4 h-4" />
+          <span>Save failed</span>
+          {onRetry && (
+            <button
+              onClick={onRetry}
+              className="underline hover:no-underline ml-1"
+            >
+              Retry
+            </button>
+          )}
+        </>
+      )}
+    </div>
+  );
+};
+```
+
+#### Context Gauge
+
+```typescript
+// src/components/chat/ContextGauge.tsx
+import { clsx } from 'clsx';
+import * as Tooltip from '@radix-ui/react-tooltip';
+import { AlertTriangle, Info } from 'lucide-react';
+
+interface ContextGaugeProps {
+  utilizationPercent: number;
+  needsSummarization: boolean;
+  onSummarizeClick: () => void;
+}
+
+export const ContextGauge: React.FC<ContextGaugeProps> = ({
+  utilizationPercent,
+  needsSummarization,
+  onSummarizeClick,
+}) => {
+  const getColor = () => {
+    if (utilizationPercent >= 85) return 'bg-red-500';
+    if (utilizationPercent >= 70) return 'bg-amber-500';
+    return 'bg-green-500';
+  };
+  
+  const getTextColor = () => {
+    if (utilizationPercent >= 85) return 'text-red-700';
+    if (utilizationPercent >= 70) return 'text-amber-700';
+    return 'text-slate-600';
+  };
+  
+  return (
+    <div className="flex items-center gap-3">
+      <Tooltip.Provider>
+        <Tooltip.Root>
+          <Tooltip.Trigger asChild>
+            <div className="flex items-center gap-2 cursor-help">
+              <div className="w-24 h-2 bg-slate-200 rounded-full overflow-hidden">
+                <div
+                  className={clsx('h-full rounded-full transition-all duration-500', getColor())}
+                  style={{ width: `${Math.min(utilizationPercent, 100)}%` }}
+                />
+              </div>
+              <span className={clsx('text-sm font-medium tabular-nums', getTextColor())}>
+                {utilizationPercent}%
+              </span>
+              {utilizationPercent >= 70 && (
+                <AlertTriangle className="w-4 h-4 text-amber-500" />
+              )}
+            </div>
+          </Tooltip.Trigger>
+          
+          <Tooltip.Portal>
+            <Tooltip.Content
+              className="bg-slate-900 text-white text-sm px-3 py-2 rounded-lg shadow-lg max-w-xs"
+              sideOffset={5}
+            >
+              <div className="flex items-start gap-2">
+                <Info className="w-4 h-4 shrink-0 mt-0.5" />
+                <div>
+                  <p className="font-medium">Context Usage</p>
+                  <p className="text-slate-300 text-xs mt-1">
+                    Claude remembers your conversation using a context window.
+                    {utilizationPercent >= 70 && ' Consider summarizing to free up space.'}
+                  </p>
+                </div>
+              </div>
+              <Tooltip.Arrow className="fill-slate-900" />
+            </Tooltip.Content>
+          </Tooltip.Portal>
+        </Tooltip.Root>
+      </Tooltip.Provider>
+      
+      {needsSummarization && (
+        <button
+          onClick={onSummarizeClick}
+          className="text-sm font-medium text-primary-600 hover:text-primary-700 transition-colors"
+        >
+          Summarize
+        </button>
+      )}
+    </div>
+  );
+};
+```
+
+#### Confirmation Dialog
+
+```typescript
+// src/components/ui/ConfirmDialog.tsx
+import * as AlertDialog from '@radix-ui/react-alert-dialog';
+import { Button } from './Button';
+import { clsx } from 'clsx';
+
+interface ConfirmDialogProps {
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  title: string;
+  description: string;
+  confirmLabel?: string;
+  cancelLabel?: string;
+  variant?: 'danger' | 'warning' | 'info';
+  onConfirm: () => void;
+  isLoading?: boolean;
+}
+
+export const ConfirmDialog: React.FC<ConfirmDialogProps> = ({
+  open,
+  onOpenChange,
+  title,
+  description,
+  confirmLabel = 'Confirm',
+  cancelLabel = 'Cancel',
+  variant = 'danger',
+  onConfirm,
+  isLoading = false,
+}) => (
+  <AlertDialog.Root open={open} onOpenChange={onOpenChange}>
+    <AlertDialog.Portal>
+      <AlertDialog.Overlay className="fixed inset-0 bg-black/50 animate-fade-in" />
+      
+      <AlertDialog.Content
+        className={clsx(
+          'fixed top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2',
+          'w-full max-w-md bg-white rounded-xl shadow-xl p-6',
+          'animate-scale-in',
+          'focus:outline-none'
+        )}
+      >
+        <AlertDialog.Title className="text-lg font-semibold text-slate-900">
+          {title}
+        </AlertDialog.Title>
+        
+        <AlertDialog.Description className="mt-2 text-sm text-slate-600">
+          {description}
+        </AlertDialog.Description>
+        
+        <div className="flex justify-end gap-3 mt-6">
+          <AlertDialog.Cancel asChild>
+            <Button variant="secondary" disabled={isLoading}>
+              {cancelLabel}
+            </Button>
+          </AlertDialog.Cancel>
+          
+          <AlertDialog.Action asChild>
+            <Button
+              variant={variant === 'danger' ? 'danger' : 'primary'}
+              onClick={onConfirm}
+              isLoading={isLoading}
+            >
+              {confirmLabel}
+            </Button>
+          </AlertDialog.Action>
+        </div>
+      </AlertDialog.Content>
+    </AlertDialog.Portal>
+  </AlertDialog.Root>
+);
+
+// Usage example for PRD deletion
+export const DeletePrdDialog: React.FC<{
+  open: boolean;
+  onOpenChange: (open: boolean) => void;
+  prdTitle: string;
+  onConfirm: () => void;
+  isLoading: boolean;
+}> = ({ open, onOpenChange, prdTitle, onConfirm, isLoading }) => (
+  <ConfirmDialog
+    open={open}
+    onOpenChange={onOpenChange}
+    title="Delete PRD"
+    description={`Are you sure you want to delete "${prdTitle}"? This PRD will be moved to trash and permanently deleted after 30 days.`}
+    confirmLabel="Delete"
+    cancelLabel="Keep it"
+    variant="danger"
+    onConfirm={onConfirm}
+    isLoading={isLoading}
+  />
+);
+```
+
+### Mobile-First Responsive Patterns
+
+```typescript
+// src/hooks/useMediaQuery.ts
+import { useState, useEffect } from 'react';
+
+export const useMediaQuery = (query: string): boolean => {
+  const [matches, setMatches] = useState(() => {
+    if (typeof window !== 'undefined') {
+      return window.matchMedia(query).matches;
+    }
+    return false;
+  });
+  
+  useEffect(() => {
+    const mediaQuery = window.matchMedia(query);
+    const handler = (e: MediaQueryListEvent) => setMatches(e.matches);
+    
+    mediaQuery.addEventListener('change', handler);
+    return () => mediaQuery.removeEventListener('change', handler);
+  }, [query]);
+  
+  return matches;
+};
+
+export const useIsMobile = () => useMediaQuery('(max-width: 768px)');
+export const useIsTablet = () => useMediaQuery('(max-width: 1024px)');
+export const useIsDesktop = () => useMediaQuery('(min-width: 1025px)');
+
+// src/components/layout/ResponsiveLayout.tsx
+export const PrdEditorLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const isMobile = useIsMobile();
+  const [activePanel, setActivePanel] = useState<'document' | 'chat'>('document');
+  
+  if (isMobile) {
+    return (
+      <div className="h-screen flex flex-col">
+        {/* Mobile tab bar */}
+        <div className="flex border-b border-slate-200">
+          <button
+            onClick={() => setActivePanel('document')}
+            className={clsx(
+              'flex-1 py-3 text-sm font-medium transition-colors',
+              activePanel === 'document'
+                ? 'text-primary-600 border-b-2 border-primary-600'
+                : 'text-slate-500'
+            )}
+          >
+            Document
+          </button>
+          <button
+            onClick={() => setActivePanel('chat')}
+            className={clsx(
+              'flex-1 py-3 text-sm font-medium transition-colors',
+              activePanel === 'chat'
+                ? 'text-primary-600 border-b-2 border-primary-600'
+                : 'text-slate-500'
+            )}
+          >
+            Chat with Claude
+          </button>
+        </div>
+        
+        {/* Content */}
+        <div className="flex-1 overflow-hidden">
+          {activePanel === 'document' ? (
+            <div className="h-full overflow-auto">{children}</div>
+          ) : (
+            <ChatPanel />
+          )}
+        </div>
+        
+        {/* Mobile input fixed at bottom */}
+        {activePanel === 'chat' && <MobileChatInput />}
+      </div>
+    );
+  }
+  
+  // Desktop: side-by-side layout
+  return (
+    <div className="h-screen flex">
+      <div className="flex-1 overflow-auto border-r border-slate-200">
+        {children}
+      </div>
+      <div className="w-96 flex flex-col">
+        <ChatPanel />
+      </div>
+    </div>
+  );
+};
+```
+
+### Keyboard Navigation
+
+```typescript
+// src/hooks/useKeyboardNavigation.ts
+import { useEffect, useCallback } from 'react';
+
+interface KeyboardShortcut {
+  key: string;
+  ctrl?: boolean;
+  shift?: boolean;
+  alt?: boolean;
+  handler: () => void;
+  description: string;
+}
+
+export const useKeyboardShortcuts = (shortcuts: KeyboardShortcut[]) => {
+  const handleKeyDown = useCallback((e: KeyboardEvent) => {
+    // Don't trigger in inputs unless it's a global shortcut
+    const target = e.target as HTMLElement;
+    const isInput = target.tagName === 'INPUT' || target.tagName === 'TEXTAREA' || target.isContentEditable;
+    
+    for (const shortcut of shortcuts) {
+      const matchesKey = e.key.toLowerCase() === shortcut.key.toLowerCase();
+      const matchesCtrl = !!shortcut.ctrl === (e.ctrlKey || e.metaKey);
+      const matchesShift = !!shortcut.shift === e.shiftKey;
+      const matchesAlt = !!shortcut.alt === e.altKey;
+      
+      if (matchesKey && matchesCtrl && matchesShift && matchesAlt) {
+        // Allow Ctrl shortcuts in inputs
+        if (isInput && !shortcut.ctrl) continue;
+        
+        e.preventDefault();
+        shortcut.handler();
+        return;
+      }
+    }
+  }, [shortcuts]);
+  
+  useEffect(() => {
+    window.addEventListener('keydown', handleKeyDown);
+    return () => window.removeEventListener('keydown', handleKeyDown);
+  }, [handleKeyDown]);
+};
+
+// Global shortcuts for the app
+export const useGlobalShortcuts = () => {
+  const navigate = useNavigate();
+  const { createPrd } = usePrdStore();
+  
+  useKeyboardShortcuts([
+    {
+      key: 'n',
+      ctrl: true,
+      handler: () => createPrd().then(prd => navigate(`/prd/${prd.id}`)),
+      description: 'Create new PRD',
+    },
+    {
+      key: 'k',
+      ctrl: true,
+      handler: () => openCommandPalette(),
+      description: 'Open command palette',
+    },
+    {
+      key: '/',
+      handler: () => document.getElementById('search-input')?.focus(),
+      description: 'Focus search',
+    },
+    {
+      key: 'Escape',
+      handler: () => closeAllModals(),
+      description: 'Close modal',
+    },
+  ]);
+};
+
+// Editor-specific shortcuts
+export const useEditorShortcuts = (prdId: string) => {
+  const { saveDraft, undo, redo } = usePrdStore();
+  
+  useKeyboardShortcuts([
+    {
+      key: 's',
+      ctrl: true,
+      handler: () => saveDraft(prdId),
+      description: 'Save',
+    },
+    {
+      key: 'z',
+      ctrl: true,
+      handler: () => undo(),
+      description: 'Undo',
+    },
+    {
+      key: 'z',
+      ctrl: true,
+      shift: true,
+      handler: () => redo(),
+      description: 'Redo',
+    },
+    {
+      key: 'Enter',
+      ctrl: true,
+      handler: () => document.getElementById('chat-input')?.focus(),
+      description: 'Focus chat',
+    },
+  ]);
+};
+
+// Keyboard shortcut help dialog
+export const KeyboardShortcutsDialog: React.FC<{ open: boolean; onClose: () => void }> = ({
+  open,
+  onClose,
+}) => {
+  const shortcuts = [
+    { keys: ['Ctrl', 'N'], description: 'Create new PRD' },
+    { keys: ['Ctrl', 'K'], description: 'Open command palette' },
+    { keys: ['Ctrl', 'S'], description: 'Save changes' },
+    { keys: ['Ctrl', 'Z'], description: 'Undo' },
+    { keys: ['Ctrl', 'Shift', 'Z'], description: 'Redo' },
+    { keys: ['Ctrl', 'Enter'], description: 'Focus chat input' },
+    { keys: ['/'], description: 'Focus search' },
+    { keys: ['Esc'], description: 'Close modal/dialog' },
+  ];
+  
+  return (
+    <Dialog open={open} onOpenChange={onClose}>
+      <DialogContent>
+        <DialogTitle>Keyboard Shortcuts</DialogTitle>
+        <div className="space-y-2 mt-4">
+          {shortcuts.map(({ keys, description }) => (
+            <div key={description} className="flex items-center justify-between py-2">
+              <span className="text-sm text-slate-600">{description}</span>
+              <div className="flex gap-1">
+                {keys.map(key => (
+                  <kbd
+                    key={key}
+                    className="px-2 py-1 text-xs font-mono bg-slate-100 border border-slate-200 rounded"
+                  >
+                    {key}
+                  </kbd>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
+      </DialogContent>
+    </Dialog>
+  );
+};
+```
+
+### Accessibility Utilities
+
+```typescript
+// src/lib/accessibility.ts
+
+// Screen reader announcements
+export const announce = (message: string, priority: 'polite' | 'assertive' = 'polite') => {
+  const el = document.createElement('div');
+  el.setAttribute('aria-live', priority);
+  el.setAttribute('aria-atomic', 'true');
+  el.setAttribute('class', 'sr-only');
+  document.body.appendChild(el);
+  
+  // Wait for DOM to register the element
+  setTimeout(() => {
+    el.textContent = message;
+    setTimeout(() => document.body.removeChild(el), 1000);
+  }, 100);
+};
+
+// Focus trap for modals
+export const useFocusTrap = (containerRef: React.RefObject<HTMLElement>) => {
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+    
+    const focusableElements = container.querySelectorAll<HTMLElement>(
+      'button, [href], input, select, textarea, [tabindex]:not([tabindex="-1"])'
+    );
+    const firstElement = focusableElements[0];
+    const lastElement = focusableElements[focusableElements.length - 1];
+    
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key !== 'Tab') return;
+      
+      if (e.shiftKey) {
+        if (document.activeElement === firstElement) {
+          e.preventDefault();
+          lastElement?.focus();
+        }
+      } else {
+        if (document.activeElement === lastElement) {
+          e.preventDefault();
+          firstElement?.focus();
+        }
+      }
+    };
+    
+    // Focus first element on mount
+    firstElement?.focus();
+    
+    container.addEventListener('keydown', handleKeyDown);
+    return () => container.removeEventListener('keydown', handleKeyDown);
+  }, [containerRef]);
+};
+
+// Skip link for keyboard users
+export const SkipLink: React.FC = () => (
+  <a
+    href="#main-content"
+    className={clsx(
+      'sr-only focus:not-sr-only',
+      'fixed top-4 left-4 z-50 px-4 py-2',
+      'bg-primary-600 text-white rounded-lg font-medium',
+      'focus:outline-none focus:ring-2 focus:ring-primary-500 focus:ring-offset-2'
+    )}
+  >
+    Skip to main content
+  </a>
+);
+
+// Tailwind sr-only class
+// .sr-only {
+//   position: absolute;
+//   width: 1px;
+//   height: 1px;
+//   padding: 0;
+//   margin: -1px;
+//   overflow: hidden;
+//   clip: rect(0, 0, 0, 0);
+//   white-space: nowrap;
+//   border-width: 0;
+// }
+```
+
+### Form Validation UX
+
+```typescript
+// src/hooks/useForm.ts
+import { useState, useCallback } from 'react';
+
+interface FieldState {
+  value: string;
+  error: string | null;
+  touched: boolean;
+}
+
+interface FormState<T extends Record<string, string>> {
+  fields: { [K in keyof T]: FieldState };
+  isSubmitting: boolean;
+  isValid: boolean;
+}
+
+type Validator = (value: string) => string | null;
+
+interface FieldConfig {
+  initialValue?: string;
+  validators?: Validator[];
+}
+
+export const useForm = <T extends Record<string, FieldConfig>>(config: T) => {
+  const initialFields = Object.fromEntries(
+    Object.entries(config).map(([key, { initialValue }]) => [
+      key,
+      { value: initialValue || '', error: null, touched: false },
+    ])
+  );
+  
+  const [fields, setFields] = useState(initialFields);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  
+  const validateField = useCallback((name: string, value: string) => {
+    const validators = config[name]?.validators || [];
+    for (const validator of validators) {
+      const error = validator(value);
+      if (error) return error;
+    }
+    return null;
+  }, [config]);
+  
+  const handleChange = useCallback((name: string) => (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const value = e.target.value;
+    setFields(prev => ({
+      ...prev,
+      [name]: { ...prev[name], value, touched: true },
+    }));
+  }, []);
+  
+  const handleBlur = useCallback((name: string) => () => {
+    setFields(prev => ({
+      ...prev,
+      [name]: {
+        ...prev[name],
+        touched: true,
+        error: validateField(name, prev[name].value),
+      },
+    }));
+  }, [validateField]);
+  
+  const validateAll = useCallback(() => {
+    let isValid = true;
+    const newFields = { ...fields };
+    
+    for (const name of Object.keys(fields)) {
+      const error = validateField(name, fields[name].value);
+      newFields[name] = { ...newFields[name], error, touched: true };
+      if (error) isValid = false;
+    }
+    
+    setFields(newFields);
+    return isValid;
+  }, [fields, validateField]);
+  
+  const handleSubmit = useCallback((onSubmit: (values: Record<string, string>) => Promise<void>) =>
+    async (e: React.FormEvent) => {
+      e.preventDefault();
+      
+      if (!validateAll()) return;
+      
+      setIsSubmitting(true);
+      try {
+        const values = Object.fromEntries(
+          Object.entries(fields).map(([key, { value }]) => [key, value])
+        );
+        await onSubmit(values);
+      } finally {
+        setIsSubmitting(false);
+      }
+    }, [fields, validateAll]);
+  
+  const getFieldProps = useCallback((name: string) => ({
+    value: fields[name]?.value || '',
+    error: fields[name]?.touched ? fields[name]?.error : null,
+    onChange: handleChange(name),
+    onBlur: handleBlur(name),
+  }), [fields, handleChange, handleBlur]);
+  
+  return {
+    fields,
+    isSubmitting,
+    isValid: Object.values(fields).every(f => !f.error),
+    handleSubmit,
+    getFieldProps,
+    validateAll,
+  };
+};
+
+// Common validators
+export const validators = {
+  required: (message = 'This field is required'): Validator =>
+    (value) => value.trim() ? null : message,
+  
+  email: (message = 'Invalid email address'): Validator =>
+    (value) => /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(value) ? null : message,
+  
+  minLength: (min: number, message?: string): Validator =>
+    (value) => value.length >= min ? null : message || `Must be at least ${min} characters`,
+  
+  maxLength: (max: number, message?: string): Validator =>
+    (value) => value.length <= max ? null : message || `Must be at most ${max} characters`,
+  
+  pattern: (regex: RegExp, message: string): Validator =>
+    (value) => regex.test(value) ? null : message,
+};
+
+// Usage example
+const CreateRuleForm: React.FC = () => {
+  const { getFieldProps, handleSubmit, isSubmitting } = useForm({
+    name: {
+      validators: [validators.required(), validators.maxLength(255)],
+    },
+    content: {
+      validators: [validators.required(), validators.maxLength(51200)],
+    },
+  });
+  
+  const onSubmit = async (values: Record<string, string>) => {
+    await api.post('/api/rules', values);
+    toast.success('Rule created');
+  };
+  
+  return (
+    <form onSubmit={handleSubmit(onSubmit)} className="space-y-4">
+      <Input
+        label="Rule Name"
+        placeholder="e.g., Security Requirements"
+        {...getFieldProps('name')}
+      />
+      
+      <Textarea
+        label="Rule Content"
+        placeholder="Enter the instructions Claude should follow..."
+        rows={10}
+        {...getFieldProps('content')}
+      />
+      
+      <Button type="submit" isLoading={isSubmitting}>
+        Create Rule
+      </Button>
+    </form>
+  );
+};
+```
+
+---
+
+## Test Examples
+
+### Backend Tests
+
+```php
+// tests/Feature/PrdControllerTest.php
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Prd;
+use App\Models\User;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Tests\TestCase;
+
+class PrdControllerTest extends TestCase
+{
+    use RefreshDatabase;
+    
+    private User $user;
+    
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->user = User::factory()->create();
+    }
+    
+    /** @test */
+    public function user_can_list_their_prds(): void
+    {
+        // Arrange
+        Prd::factory()->count(3)->create(['user_id' => $this->user->id]);
+        Prd::factory()->count(2)->create(); // Other user's PRDs
+        
+        // Act
+        $response = $this->actingAs($this->user)
+            ->getJson('/api/prds');
+        
+        // Assert
+        $response->assertOk()
+            ->assertJsonCount(3, 'data')
+            ->assertJsonStructure([
+                'data' => [
+                    '*' => ['id', 'title', 'status', 'created_at', 'updated_at'],
+                ],
+            ]);
+    }
+    
+    /** @test */
+    public function user_can_create_prd(): void
+    {
+        // Act
+        $response = $this->actingAs($this->user)
+            ->postJson('/api/prds', [
+                'title' => 'My New PRD',
+            ]);
+        
+        // Assert
+        $response->assertCreated()
+            ->assertJsonPath('title', 'My New PRD')
+            ->assertJsonPath('status', 'draft');
+        
+        $this->assertDatabaseHas('prds', [
+            'user_id' => $this->user->id,
+            'title' => 'My New PRD',
+        ]);
+        
+        // Verify file was created
+        $prdId = $response->json('id');
+        $filePath = storage_path("prds/{$this->user->id}/{$prdId}.md");
+        $this->assertFileExists($filePath);
+    }
+    
+    /** @test */
+    public function user_cannot_access_other_users_prd(): void
+    {
+        // Arrange
+        $otherUser = User::factory()->create();
+        $prd = Prd::factory()->create(['user_id' => $otherUser->id]);
+        
+        // Act
+        $response = $this->actingAs($this->user)
+            ->getJson("/api/prds/{$prd->id}");
+        
+        // Assert - 404 not 403 (prevent enumeration)
+        $response->assertNotFound();
+    }
+    
+    /** @test */
+    public function prd_is_soft_deleted(): void
+    {
+        // Arrange
+        $prd = Prd::factory()->create(['user_id' => $this->user->id]);
+        
+        // Act
+        $response = $this->actingAs($this->user)
+            ->deleteJson("/api/prds/{$prd->id}");
+        
+        // Assert
+        $response->assertOk();
+        $this->assertSoftDeleted('prds', ['id' => $prd->id]);
+    }
+    
+    /** @test */
+    public function free_tier_user_cannot_create_more_than_3_prds(): void
+    {
+        // Arrange
+        $this->user->update(['tier' => 'free']);
+        Prd::factory()->count(3)->create(['user_id' => $this->user->id]);
+        
+        // Act
+        $response = $this->actingAs($this->user)
+            ->postJson('/api/prds', ['title' => 'Fourth PRD']);
+        
+        // Assert
+        $response->assertStatus(402)
+            ->assertJsonPath('code', 'TIER_LIMIT_REACHED');
+    }
+}
+
+// tests/Feature/ChatControllerTest.php
+<?php
+
+namespace Tests\Feature;
+
+use App\Models\Prd;
+use App\Models\User;
+use App\Services\AnthropicService;
+use Illuminate\Foundation\Testing\RefreshDatabase;
+use Mockery;
+use Tests\TestCase;
+
+class ChatControllerTest extends TestCase
+{
+    use RefreshDatabase;
+    
+    /** @test */
+    public function user_can_send_message_and_receive_streamed_response(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $prd = Prd::factory()->create(['user_id' => $user->id]);
+        
+        // Mock Anthropic service
+        $this->mock(AnthropicService::class, function ($mock) {
+            $mock->shouldReceive('streamChat')
+                ->once()
+                ->andReturnUsing(function () {
+                    yield ['type' => 'chunk', 'text' => 'Hello, '];
+                    yield ['type' => 'chunk', 'text' => 'how can I help?'];
+                    yield ['type' => 'done', 'full_response' => 'Hello, how can I help?'];
+                });
+        });
+        
+        // Act
+        $response = $this->actingAs($user)
+            ->postJson("/api/prds/{$prd->id}/messages", [
+                'content' => 'Help me with my PRD',
+            ]);
+        
+        // Assert
+        $response->assertOk()
+            ->assertHeader('Content-Type', 'text/event-stream');
+        
+        // Verify messages saved
+        $this->assertDatabaseHas('messages', [
+            'prd_id' => $prd->id,
+            'role' => 'user',
+            'content' => 'Help me with my PRD',
+        ]);
+        
+        $this->assertDatabaseHas('messages', [
+            'prd_id' => $prd->id,
+            'role' => 'assistant',
+            'content' => 'Hello, how can I help?',
+        ]);
+    }
+    
+    /** @test */
+    public function rate_limiting_prevents_spam(): void
+    {
+        // Arrange
+        $user = User::factory()->create();
+        $prd = Prd::factory()->create(['user_id' => $user->id]);
+        
+        // Act - Send 2 requests immediately
+        $response1 = $this->actingAs($user)
+            ->postJson("/api/prds/{$prd->id}/messages", ['content' => 'First']);
+        
+        $response2 = $this->actingAs($user)
+            ->postJson("/api/prds/{$prd->id}/messages", ['content' => 'Second']);
+        
+        // Assert
+        $response1->assertOk();
+        $response2->assertStatus(429)
+            ->assertJsonPath('code', 'RATE_LIMITED')
+            ->assertJsonStructure(['retry_after']);
+    }
+}
+
+// tests/Unit/TokenEncryptionServiceTest.php
+<?php
+
+namespace Tests\Unit;
+
+use App\Services\TokenEncryptionService;
+use Tests\TestCase;
+
+class TokenEncryptionServiceTest extends TestCase
+{
+    private TokenEncryptionService $service;
+    
+    protected function setUp(): void
+    {
+        parent::setUp();
+        config(['app.token_encryption_key' => base64_encode(random_bytes(32))]);
+        $this->service = new TokenEncryptionService();
+    }
+    
+    /** @test */
+    public function it_encrypts_and_decrypts_correctly(): void
+    {
+        $original = 'ya29.a0AfB_byC1234567890';
+        
+        $encrypted = $this->service->encrypt($original);
+        $decrypted = $this->service->decrypt($encrypted);
+        
+        $this->assertNotEquals($original, $encrypted);
+        $this->assertEquals($original, $decrypted);
+    }
+    
+    /** @test */
+    public function encrypted_values_are_different_each_time(): void
+    {
+        $original = 'test_token';
+        
+        $encrypted1 = $this->service->encrypt($original);
+        $encrypted2 = $this->service->encrypt($original);
+        
+        $this->assertNotEquals($encrypted1, $encrypted2);
+    }
+    
+    /** @test */
+    public function it_throws_on_tampered_data(): void
+    {
+        $this->expectException(\RuntimeException::class);
+        
+        $encrypted = $this->service->encrypt('test');
+        $tampered = base64_encode(str_repeat('x', 50));
+        
+        $this->service->decrypt($tampered);
+    }
+}
+```
+
+### Frontend Tests
+
+```typescript
+// src/components/ui/__tests__/Button.test.tsx
+import { render, screen, fireEvent } from '@testing-library/react';
+import { Button } from '../Button';
+
+describe('Button', () => {
+  it('renders children correctly', () => {
+    render(<Button>Click me</Button>);
+    expect(screen.getByRole('button', { name: /click me/i })).toBeInTheDocument();
+  });
+  
+  it('handles click events', () => {
+    const handleClick = vi.fn();
+    render(<Button onClick={handleClick}>Click me</Button>);
+    
+    fireEvent.click(screen.getByRole('button'));
+    
+    expect(handleClick).toHaveBeenCalledTimes(1);
+  });
+  
+  it('shows loading spinner when isLoading', () => {
+    render(<Button isLoading>Submit</Button>);
+    
+    const button = screen.getByRole('button');
+    expect(button).toBeDisabled();
+    expect(screen.getByTestId('spinner')).toBeInTheDocument();
+  });
+  
+  it('is disabled when disabled prop is true', () => {
+    render(<Button disabled>Submit</Button>);
+    expect(screen.getByRole('button')).toBeDisabled();
+  });
+  
+  it('applies variant styles correctly', () => {
+    const { rerender } = render(<Button variant="primary">Primary</Button>);
+    expect(screen.getByRole('button')).toHaveClass('bg-primary-600');
+    
+    rerender(<Button variant="danger">Danger</Button>);
+    expect(screen.getByRole('button')).toHaveClass('bg-red-600');
+  });
+});
+
+// src/stores/__tests__/authStore.test.ts
+import { renderHook, act } from '@testing-library/react';
+import { useAuthStore } from '../authStore';
+
+describe('authStore', () => {
+  beforeEach(() => {
+    useAuthStore.setState({ user: null, isAuthenticated: false, isLoading: true });
+  });
+  
+  it('checkAuth sets user when authenticated', async () => {
+    const mockUser = { id: '1', name: 'Test User', email: 'test@example.com' };
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+      ok: true,
+      json: () => Promise.resolve(mockUser),
+    } as Response);
+    
+    const { result } = renderHook(() => useAuthStore());
+    
+    await act(async () => {
+      await result.current.checkAuth();
+    });
+    
+    expect(result.current.user).toEqual(mockUser);
+    expect(result.current.isAuthenticated).toBe(true);
+    expect(result.current.isLoading).toBe(false);
+  });
+  
+  it('checkAuth clears user when not authenticated', async () => {
+    vi.spyOn(global, 'fetch').mockResolvedValueOnce({
+      ok: false,
+      status: 401,
+    } as Response);
+    
+    const { result } = renderHook(() => useAuthStore());
+    
+    await act(async () => {
+      await result.current.checkAuth();
+    });
+    
+    expect(result.current.user).toBeNull();
+    expect(result.current.isAuthenticated).toBe(false);
+    expect(result.current.isLoading).toBe(false);
+  });
+});
+
+// src/pages/__tests__/Dashboard.test.tsx
+import { render, screen, waitFor } from '@testing-library/react';
+import userEvent from '@testing-library/user-event';
+import { MemoryRouter } from 'react-router-dom';
+import { Dashboard } from '../Dashboard';
+import { usePrdStore } from '@/stores/prdStore';
+
+const mockPrds = [
+  { id: '1', title: 'First PRD', status: 'draft', created_at: '2026-02-01' },
+  { id: '2', title: 'Second PRD', status: 'active', created_at: '2026-02-02' },
+];
+
+describe('Dashboard', () => {
+  beforeEach(() => {
+    usePrdStore.setState({ prds: mockPrds, isLoading: false, error: null });
+  });
+  
+  it('renders PRD list', () => {
+    render(<Dashboard />, { wrapper: MemoryRouter });
+    
+    expect(screen.getByText('First PRD')).toBeInTheDocument();
+    expect(screen.getByText('Second PRD')).toBeInTheDocument();
+  });
+  
+  it('shows loading skeleton while fetching', () => {
+    usePrdStore.setState({ prds: [], isLoading: true });
+    
+    render(<Dashboard />, { wrapper: MemoryRouter });
+    
+    expect(screen.getByTestId('dashboard-skeleton')).toBeInTheDocument();
+  });
+  
+  it('shows empty state when no PRDs', () => {
+    usePrdStore.setState({ prds: [], isLoading: false });
+    
+    render(<Dashboard />, { wrapper: MemoryRouter });
+    
+    expect(screen.getByText(/no prds yet/i)).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: /create/i })).toBeInTheDocument();
+  });
+  
+  it('filters PRDs by search query', async () => {
+    const user = userEvent.setup();
+    render(<Dashboard />, { wrapper: MemoryRouter });
+    
+    const searchInput = screen.getByPlaceholderText(/search/i);
+    await user.type(searchInput, 'First');
+    
+    await waitFor(() => {
+      expect(screen.getByText('First PRD')).toBeInTheDocument();
+      expect(screen.queryByText('Second PRD')).not.toBeInTheDocument();
+    });
+  });
+  
+  it('shows error state with retry button', async () => {
+    const fetchPrds = vi.fn();
+    usePrdStore.setState({ prds: [], isLoading: false, error: 'Failed to fetch', fetchPrds });
+    
+    render(<Dashboard />, { wrapper: MemoryRouter });
+    
+    expect(screen.getByText(/failed to load/i)).toBeInTheDocument();
+    
+    const retryButton = screen.getByRole('button', { name: /retry/i });
+    await userEvent.click(retryButton);
+    
+    expect(fetchPrds).toHaveBeenCalled();
+  });
+});
+```
+
+---
+
 ## Final Verification Checklist
 
 Before deployment, all items must be checked:
