@@ -4,6 +4,7 @@ use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\PrdController;
+use App\Http\Controllers\ShareController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -54,4 +55,19 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::post('/prds/{prdId}/attachments', [AttachmentController::class, 'store']);
     Route::get('/prds/{prdId}/attachments/{attachmentId}', [AttachmentController::class, 'show']);
     Route::delete('/prds/{prdId}/attachments/{attachmentId}', [AttachmentController::class, 'destroy']);
+
+    // ----- Sharing: Collaborators -----
+    Route::get('/prds/{prdId}/collaborators', [ShareController::class, 'listCollaborators']);
+    Route::post('/prds/{prdId}/collaborators', [ShareController::class, 'addCollaborator']);
+    Route::delete('/prds/{prdId}/collaborators/{collaboratorId}', [ShareController::class, 'removeCollaborator']);
+
+    // ----- Sharing: Share Links -----
+    Route::get('/prds/{prdId}/share-links', [ShareController::class, 'listShareLinks']);
+    Route::post('/prds/{prdId}/share-links', [ShareController::class, 'createShareLink']);
+    Route::delete('/prds/{prdId}/share-links/{linkId}', [ShareController::class, 'revokeShareLink']);
 });
+
+// ============================================
+// PUBLIC SHARE ACCESS (No Auth)
+// ============================================
+Route::post('/share/{token}', [ShareController::class, 'accessSharedPrd']);
