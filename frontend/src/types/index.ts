@@ -9,6 +9,19 @@ export interface User {
   last_prd_id: string | null;
 }
 
+// PRD types
+export type PrdStatus = 'draft' | 'active' | 'archived';
+
+export interface Prd {
+  id: string;
+  title: string;
+  status: PrdStatus;
+  estimated_tokens: number;
+  created_from_template_id: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
 // API Error type
 export interface ApiError {
   message: string;

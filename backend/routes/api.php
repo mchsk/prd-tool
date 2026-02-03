@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\AuthController;
+use App\Http\Controllers\PrdController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
@@ -28,7 +29,16 @@ Route::get('/health', function () {
 // AUTHENTICATED ROUTES
 // ============================================
 Route::middleware(['auth:sanctum'])->group(function () {
-    // User
+    // ----- User -----
     Route::get('/user', [AuthController::class, 'user']);
     Route::post('/logout', [AuthController::class, 'logout']);
+
+    // ----- PRDs -----
+    Route::get('/prds', [PrdController::class, 'index']);
+    Route::post('/prds', [PrdController::class, 'store']);
+    Route::get('/prds/{id}', [PrdController::class, 'show']);
+    Route::put('/prds/{id}', [PrdController::class, 'update']);
+    Route::delete('/prds/{id}', [PrdController::class, 'destroy']);
+    Route::get('/prds/{id}/content', [PrdController::class, 'getContent']);
+    Route::put('/prds/{id}/content', [PrdController::class, 'updateContent']);
 });

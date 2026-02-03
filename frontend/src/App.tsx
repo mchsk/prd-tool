@@ -3,6 +3,7 @@ import { BrowserRouter, Routes, Route, Navigate, useSearchParams } from 'react-r
 import { useAuthStore } from '@/stores/authStore';
 import { LoginPage } from '@/pages/LoginPage';
 import { DashboardPage } from '@/pages/DashboardPage';
+import { PrdEditorPage } from '@/pages/PrdEditorPage';
 import { ProtectedRoute } from '@/components/auth/ProtectedRoute';
 
 // Token handler component for OAuth callback
@@ -36,6 +37,14 @@ function App() {
           element={
             <ProtectedRoute>
               <DashboardPage />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/prd/:id"
+          element={
+            <ProtectedRoute>
+              <PrdEditorPage />
             </ProtectedRoute>
           }
         />
