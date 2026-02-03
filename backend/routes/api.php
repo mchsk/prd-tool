@@ -4,6 +4,7 @@ use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\ExportController;
 use App\Http\Controllers\PrdController;
 use App\Http\Controllers\RuleController;
 use App\Http\Controllers\ShareController;
@@ -85,6 +86,12 @@ Route::middleware(['auth:sanctum'])->group(function () {
     // ----- PRD Rule Assignments -----
     Route::get('/prds/{prdId}/rules', [RuleController::class, 'assigned']);
     Route::post('/prds/{prdId}/rules', [RuleController::class, 'assign']);
+
+    // ----- Export -----
+    Route::get('/prds/{prdId}/export/formats', [ExportController::class, 'formats']);
+    Route::get('/prds/{prdId}/export/markdown', [ExportController::class, 'markdown']);
+    Route::get('/prds/{prdId}/export/html', [ExportController::class, 'html']);
+    Route::get('/prds/{prdId}/export/pdf', [ExportController::class, 'pdf']);
 });
 
 // ============================================
