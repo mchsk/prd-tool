@@ -66,6 +66,16 @@ class Prd extends Model
     }
 
     /**
+     * Get the SME agents attached to this PRD.
+     */
+    public function smeAgents(): BelongsToMany
+    {
+        return $this->belongsToMany(SmeAgent::class, 'prd_sme_agents')
+            ->withPivot('priority')
+            ->withTimestamps();
+    }
+
+    /**
      * Scope to get PRDs for a specific user.
      */
     public function scopeForUser($query, string $userId)

@@ -11,6 +11,7 @@ use App\Http\Controllers\PrdController;
 use App\Http\Controllers\PresenceController;
 use App\Http\Controllers\RuleController;
 use App\Http\Controllers\ShareController;
+use App\Http\Controllers\SmeAgentController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TemplateController;
 use App\Http\Controllers\TranslationController;
@@ -148,6 +149,17 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/translation/status', [TranslationController::class, 'status']);
     Route::post('/translation/text', [TranslationController::class, 'translateText']);
     Route::post('/prds/{prdId}/translate', [TranslationController::class, 'translatePrd']);
+
+    // ----- SME Agents -----
+    Route::get('/agents', [SmeAgentController::class, 'index']);
+    Route::get('/agents/categories', [SmeAgentController::class, 'categories']);
+    Route::post('/agents', [SmeAgentController::class, 'store']);
+    Route::get('/agents/{id}', [SmeAgentController::class, 'show']);
+    Route::put('/agents/{id}', [SmeAgentController::class, 'update']);
+    Route::delete('/agents/{id}', [SmeAgentController::class, 'destroy']);
+    Route::get('/prds/{prdId}/agents', [SmeAgentController::class, 'assigned']);
+    Route::post('/prds/{prdId}/agents', [SmeAgentController::class, 'assign']);
+    Route::get('/prds/{prdId}/agents/prompt', [SmeAgentController::class, 'getCombinedPrompt']);
 });
 
 // ============================================
