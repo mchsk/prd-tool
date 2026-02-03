@@ -13,6 +13,7 @@ use App\Http\Controllers\RuleController;
 use App\Http\Controllers\ShareController;
 use App\Http\Controllers\TeamController;
 use App\Http\Controllers\TemplateController;
+use App\Http\Controllers\TranslationController;
 use App\Http\Controllers\VersionController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
@@ -142,6 +143,11 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/billing/plans', [BillingController::class, 'plans']);
     Route::post('/billing/checkout', [BillingController::class, 'createCheckout']);
     Route::post('/billing/portal', [BillingController::class, 'portal']);
+
+    // ----- Translation -----
+    Route::get('/translation/status', [TranslationController::class, 'status']);
+    Route::post('/translation/text', [TranslationController::class, 'translateText']);
+    Route::post('/prds/{prdId}/translate', [TranslationController::class, 'translatePrd']);
 });
 
 // ============================================
