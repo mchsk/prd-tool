@@ -3,6 +3,7 @@
 use App\Http\Controllers\AttachmentController;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\ChatController;
+use App\Http\Controllers\CommentController;
 use App\Http\Controllers\PrdController;
 use App\Http\Controllers\ShareController;
 use Illuminate\Http\Request;
@@ -65,6 +66,13 @@ Route::middleware(['auth:sanctum'])->group(function () {
     Route::get('/prds/{prdId}/share-links', [ShareController::class, 'listShareLinks']);
     Route::post('/prds/{prdId}/share-links', [ShareController::class, 'createShareLink']);
     Route::delete('/prds/{prdId}/share-links/{linkId}', [ShareController::class, 'revokeShareLink']);
+
+    // ----- Comments -----
+    Route::get('/prds/{prdId}/comments', [CommentController::class, 'index']);
+    Route::get('/prds/{prdId}/comments/{commentId}', [CommentController::class, 'show']);
+    Route::post('/prds/{prdId}/comments', [CommentController::class, 'store']);
+    Route::put('/prds/{prdId}/comments/{commentId}', [CommentController::class, 'update']);
+    Route::delete('/prds/{prdId}/comments/{commentId}', [CommentController::class, 'destroy']);
 });
 
 // ============================================
